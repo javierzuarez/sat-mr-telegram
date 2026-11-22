@@ -1,12 +1,3 @@
-"""
-Prueba de la consulta nacional sin necesidad de token de Telegram.
-
-Consulta el índice de estaciones activas del IDEAM, resuelve varios nombres
-de municipio, prueba la búsqueda por coordenadas e imprime las alertas.
-
-Ejecución:
-    python demo_nacional.py
-"""
 
 import re
 import sys

@@ -23,6 +23,19 @@ IDEAM (datos.gov.co) → índice de ~595 estaciones activas → búsqueda del mu
 
 ---
 
+## Fuentes oficiales (enlaces clicables)
+
+- Dataset consultado por el bot: **Datos de Estaciones de IDEAM y de Terceros**
+  https://www.datos.gov.co/dataset/57sv-p2fu
+- Endpoint JSON que usa el código (`ideam.py`, línea 22):
+  https://www.datos.gov.co/resource/57sv-p2fu.json
+- Sitio oficial del IDEAM: https://www.ideam.gov.co/
+- Catálogo de estaciones (referencia): https://www.datos.gov.co/resource/hp9r-jxuu.json
+
+Dentro del bot, estos enlaces aparecen con el comando **`/fuente`**.
+
+---
+
 ## 2. Requisitos
 
 - Python 3.9 o superior (probado con Python 3.14).
@@ -106,6 +119,7 @@ Se aceptan nombres sin tildes (`medellin`), en mayúsculas (`POPAYAN`) y con err
 | `/zonas` | Lista las zonas del piloto y sus estaciones |
 | `/alertas` | Fuerza la revisión de todas las zonas del piloto |
 | `/demo` | Envía los tres niveles con datos de ejemplo (para el video) |
+| `/fuente` | Muestra los enlaces del IDEAM y del dataset usado |
 | `/start`, `/ayuda` | Bienvenida y ayuda |
 
 No hay suscripciones: cualquier persona que haya iniciado el bot recibe las alertas.

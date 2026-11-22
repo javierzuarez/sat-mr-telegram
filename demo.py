@@ -1,13 +1,3 @@
-"""
-Demostración sin token de Telegram.
-
-Consulta el IDEAM en vivo, clasifica el riesgo de cada zona del piloto e
-imprime exactamente el mensaje que el bot enviaría por Telegram.
-
-Ejecución:
-    python demo.py
-"""
-
 import re
 import sys
 import time

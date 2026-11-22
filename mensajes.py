@@ -151,7 +151,21 @@ BIENVENIDA = (
     "/estado — riesgo actual de las zonas del piloto\n"
     "/zonas — listar las zonas del piloto\n\n"
     "/demo — ejemplo de los tres niveles\n"
+    "/fuente — enlaces de donde salen los datos\n"
     "/ayuda — mostrar esta ayuda"
 )
 
 AYUDA = BIENVENIDA
+
+FUENTES = (
+    "<b>De dónde salen los datos</b>\n\n"
+    "El IDEAM publica la información en el Portal Nacional de Datos Abiertos.\n"
+    "El bot consulta directamente este conjunto (precipitación cada 10 minutos):\n\n"
+    "<a href=\"https://www.datos.gov.co/dataset/57sv-p2fu\">"
+    "📊 Datos de Estaciones de IDEAM y de Terceros</a>\n"
+    "https://www.datos.gov.co/dataset/57sv-p2fu\n\n"
+    "<a href=\"https://www.ideam.gov.co/\">🌎 Sitio oficial del IDEAM</a>\n"
+    "https://www.ideam.gov.co/\n\n"
+    "<i>Datos crudos sin validar oficialmente. No sustituyen los sistemas "
+    "oficiales de alerta de emergencia.</i>"
+)

@@ -1,24 +1,10 @@
-"""
-Cliente de datos abiertos del IDEAM (datos.gov.co).
-
-Fuente: conjunto 57sv-p2fu — "Datos de Estaciones de IDEAM y de Terceros".
-No requiere API key ni librerías externas.
-
-Dos advertencias descubiertas al probar la API en vivo:
-
-1. Las fechas (fechaobservacion) vienen en HORA LOCAL DE COLOMBIA (UTC-5)
-   y sin sufijo de zona horaria. Si se comparan contra UTC, la consulta
-   devuelve cero registros.
-2. Los valores son crudos y sin validar. Se han observado lecturas
-   imposibles (decenas de miles de mm en una hora), así que hay que
-   descartar valores fuera de rango antes de usarlos.
-"""
-
 import json
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
+# Página del dataset: https://www.datos.gov.co/dataset/57sv-p2fu
+# Sitio oficial:      https://www.ideam.gov.co/
 BASE = "https://www.datos.gov.co/resource/57sv-p2fu.json"
 ZONA_HORARIA = timezone(timedelta(hours=-5))  # hora local de Colombia
 MAX_PLAUSIBLE_10MIN = 30.0                    # mm; por encima se asume error de sensor

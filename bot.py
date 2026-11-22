@@ -1,20 +1,8 @@
 """
 Bot de Telegram del Sistema de Alertas Tempranas de Movilidad Rural.
-
-Ejecución:
-    python bot.py
-
-Requiere un archivo .env con:
-    TELEGRAM_TOKEN=123456:ABC...
-
-Opcional:
-    AUTO_ALERTAS=1   -> revisa las zonas del piloto cada 10 minutos y avisa
-                        cuando el nivel cambia a MEDIO o ALTO.
-
 Comandos nacionales: /consultar, /ubicacion, /buscar, /departamentos
 Comandos del piloto: /estado, /zonas, /alertas
 """
-
 import json
 import os
 import sys
@@ -38,9 +26,6 @@ INTERVALO_AUTO = 600  # segundos entre revisiones automáticas
 _candado = threading.Lock()
 
 
-# ----------------------------------------------------------------------
-# Persistencia sencilla en JSON
-# ----------------------------------------------------------------------
 def _leer_json(ruta, defecto):
     if not os.path.exists(ruta):
         return defecto
@@ -69,7 +54,7 @@ def registrar_usuario(chat_id):
 
 
 # ----------------------------------------------------------------------
-# Apoyo para las consultas nacionales
+# "Apoyo para las consultas nacionales"
 # ----------------------------------------------------------------------
 def _argumentos(texto):
     """Devuelve lo que el usuario escribió después del comando."""
@@ -227,6 +212,11 @@ def cmd_departamentos(token, chat_id, _texto):
     tg.enviar(token, chat_id, texto)
 
 
+def cmd_fuente(token, chat_id, _texto):
+    registrar_usuario(chat_id)
+    tg.enviar(token, chat_id, mensajes.FUENTES)
+
+
 # ----------------------------------------------------------------------
 # Comandos del piloto
 # ----------------------------------------------------------------------
@@ -305,6 +295,8 @@ COMANDOS = {
     "/buscar": cmd_buscar,
     "/departamentos": cmd_departamentos,
     "/cobertura": cmd_departamentos,
+    "/fuente": cmd_fuente,
+    "/fuentes": cmd_fuente,
     "/estado": cmd_estado,
     "/zonas": cmd_zonas,
     "/demo": cmd_demo,
