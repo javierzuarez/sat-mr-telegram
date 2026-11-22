@@ -1,9 +1,20 @@
-name: Bot SAT-MR (cada 5 minutos)
+name: Bot SAT-MR (cada minuto)
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    # GitHub permite minimo 5 min por cron; se escalonan 5 crones
+    # para revisar aproximadamente cada minuto.
+    - cron: '0-59/5 * * * *'
+    - cron: '1-59/5 * * * *'
+    - cron: '2-59/5 * * * *'
+    - cron: '3-59/5 * * * *'
+    - cron: '4-59/5 * * * *'
   workflow_dispatch:
+
+# Evita que dos ejecuciones se pisen al leer/guardar el offset.
+concurrency:
+  group: bot-sat-mr
+  cancel-in-progress: false
 
 permissions:
   contents: write

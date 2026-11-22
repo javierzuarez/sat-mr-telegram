@@ -401,7 +401,7 @@ def ejecutar_una_vez(token):
     """Modo GitHub Actions: procesa las novedades pendientes y termina."""
     offset = _leer_offset()
     try:
-        updates = tg.actualizaciones(token, offset=offset or None, timeout=10)
+        updates = tg.actualizaciones(token, offset=offset or None, timeout=3)
     except tg.TelegramError as exc:
         print(f"[polling] {exc}")
         return

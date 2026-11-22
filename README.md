@@ -246,13 +246,15 @@ Para un piloto comunitario el costo es **$0**.
 El bot también corre **en la nube sin costo** usando el repositorio público:
 
 - Archivo: `.github/workflows/bot.yml`
-- Frecuencia: cada **5 minutos** (cron `*/5 * * * *`)
+- Frecuencia: aproximadamente cada **1 minuto** (5 crones escalonados; GitHub no permite menos de
+  5 min por cron, por eso se combinan `0-59/5`, `1-59/5`, `2-59/5`, `3-59/5` y `4-59/5`)
 - Comando: `python bot.py --once` (procesa lo pendiente y termina)
 - Token: guardado como **Secret** `TELEGRAM_TOKEN` en *Settings → Secrets and variables → Actions*
 - Estado: `offset.txt`, `usuarios.json` y `estado_zonas.json` se guardan de vuelta en el repo con
   un commit automático `[skip ci]`, para no responder dos veces el mismo mensaje.
 
-Para probarlo: abra el bot en Telegram y envíe `/start`. La respuesta puede tardar **hasta 5 minutos**.
+Para probarlo: abra el bot en Telegram y envíe `/start`. La respuesta suele tardar **menos de 1 minuto**
+(puede llegar a 2 min si GitHub retrasa la cola).
 
 ⚠️ Si el bot corre en GitHub Actions, **detenga el bot local** (`Ctrl+C` en la terminal o no use
 `Ctrl+Shift+B`). Si los dos están activos, Telegram reparte los mensajes entre ellos y se duplican
