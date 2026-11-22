@@ -21,8 +21,22 @@ def cargar_env(ruta=None):
 
 
 def token():
+    """Devuelve el token desde entorno, .env o un archivo fuera del repo."""
     cargar_env()
-    return os.environ.get("TELEGRAM_TOKEN", "").strip()
+    valor = os.environ.get("TELEGRAM_TOKEN", "").strip()
+    if valor:
+        return valor
+
+    # En PythonAnywhere es más cómodo guardar el token en un archivo fuera del
+    # repositorio, por ejemplo /home/usuario/.satmr_token, y apuntar aquí.
+    ruta = os.environ.get("TELEGRAM_TOKEN_FILE", "").strip()
+    if ruta:
+        try:
+            with open(os.path.expanduser(ruta), encoding="utf-8") as archivo:
+                return archivo.read().strip()
+        except OSError as exc:
+            print(f"[config] no se pudo leer TELEGRAM_TOKEN_FILE: {exc}")
+    return ""
 
 
 def zonas():

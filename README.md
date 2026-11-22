@@ -165,8 +165,11 @@ la API de datos.gov.co.
 | `mensajes.py` | Redacción de las alertas (formato del SMS del boceto). |
 | `telegram_api.py` | Cliente HTTP mínimo de la Bot API, con reintentos por límite de velocidad. |
 | `bot.py` | Bucle de comandos, registro de usuarios y avisos automáticos. |
+| `webhook.py` | Entrada WSGI para responder por webhook en PythonAnywhere. |
+| `configurar_webhook.py` | Configura, consulta o elimina el webhook de Telegram. |
+| `pythonanywhere_wsgi.py.example` | Plantilla del archivo WSGI (secretos fuera del repo). |
 | `demo.py`, `demo_nacional.py` | Pruebas de consola sin token. |
-| `config.py` | Lectura de `.env` y del archivo de zonas. |
+| `config.py` | Lectura de `.env`, de `TELEGRAM_TOKEN_FILE` y del archivo de zonas. |
 | `zonas.json` | Zonas del piloto de Cundinamarca y sus estaciones. |
 | `usuarios.json` | Se crea solo: guarda los chats que han iniciado el bot. |
 | `estado_zonas.json` | Se crea solo: nivel anterior de cada zona (avisos automáticos). |
@@ -241,9 +244,27 @@ Para un piloto comunitario el costo es **$0**.
 
 ---
 
-## 12. Despliegue gratuito en GitHub Actions
+## 12. Despliegue recomendado: webhook en PythonAnywhere (gratis)
 
-El bot también corre **en la nube sin costo** usando el repositorio público:
+Para **respuesta inmediata** (1–3 s), use el plan gratuito de PythonAnywhere. Telegram avisa
+al web app en cuanto se envía un mensaje; no hay que esperar ningún ciclo de polling.
+
+- Archivos nuevos: `webhook.py`, `configurar_webhook.py`, `pythonanywhere_wsgi.py.example`
+- Guía completa, paso a paso: **[DESPLIEGUE_PYTHONANYWHERE.md](DESPLIEGUE_PYTHONANYWHERE.md)**
+- Dominios necesarios (ya verificados en la lista de PythonAnywhere): `api.telegram.org` y
+  `www.datos.gov.co`
+- Token: archivo `~/.satmr_token` **fuera del repo**, referenciado por `TELEGRAM_TOKEN_FILE`
+- Protección: ruta secreta (`WEBHOOK_PATH`) + header secreto (`WEBHOOK_SECRET`)
+- Estado local: `webhook_offset.txt` evita responder dos veces un update reenviado
+
+Resumen: cree el Web App con *Manual configuration*, pegue la plantilla WSGI, ejecute
+`python configurar_webhook.py set` y pruebe `/start` en Telegram.
+
+---
+
+## 13. Respaldo: GitHub Actions (sin webhook)
+
+Si no se configura PythonAnywhere, el bot corre **en la nube sin costo** usando el repositorio público:
 
 - Archivo: `.github/workflows/bot.yml`
 - Frecuencia: aproximadamente cada **1 minuto** (5 crones escalonados; GitHub no permite menos de
@@ -253,12 +274,12 @@ El bot también corre **en la nube sin costo** usando el repositorio público:
 - Estado: `offset.txt`, `usuarios.json` y `estado_zonas.json` se guardan de vuelta en el repo con
   un commit automático `[skip ci]`, para no responder dos veces el mismo mensaje.
 
-Para probarlo: abra el bot en Telegram y envíe `/start`. La respuesta suele tardar **menos de 1 minuto**
-(puede llegar a 2 min si GitHub retrasa la cola).
+Con webhook activo, `bot.py --once` detecta `getWebhookInfo` y **omite `getUpdates`** para no
+competir con PythonAnywhere, pero mantiene las alertas automáticas del piloto.
 
-⚠️ Si el bot corre en GitHub Actions, **detenga el bot local** (`Ctrl+C` en la terminal o no use
-`Ctrl+Shift+B`). Si los dos están activos, Telegram reparte los mensajes entre ellos y se duplican
-o se pierden respuestas.
+⚠️ Si el bot corre por polling (sin webhook), **detenga el bot local** (`Ctrl+C` en la terminal o
+no use `Ctrl+Shift+B`). Si los dos están activos, Telegram reparte los mensajes y se duplican o
+se pierden respuestas. Con webhook activo, `bot.py` directamente se negará a arrancar en local.
 
 ⚠️ GitHub desactiva los workflows programados después de **60 días sin actividad** en el repo.
 Haga un commit o ejecute el workflow manualmente (*Actions → Run workflow*) al menos una vez al mes.
@@ -267,7 +288,7 @@ También puede forzar una ejecución desde la pestaña **Actions** del repositor
 
 ---
 
-## 13. Alcance y advertencia
+## 14. Alcance y advertencia
 
 Este bot es un **canal comunitario de demostración**, no sustituye los sistemas oficiales de
 alerta de emergencia (SMS masivo o *cell broadcast*). Requiere que la persona tenga teléfono

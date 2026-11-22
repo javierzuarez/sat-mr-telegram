@@ -4,6 +4,7 @@ Bot de Telegram del Sistema de Alertas Tempranas de Movilidad Rural.
 Ejecución:
     python bot.py            -> modo continuo (PC encendida)
     python bot.py --once     -> una sola revisión (GitHub Actions)
+    webhook.py               -> WSGI para PythonAnywhere (respuesta inmediata)
 
 Requiere un archivo .env con:
     TELEGRAM_TOKEN=123456:ABC...
@@ -397,27 +398,35 @@ def procesar(token, update):
         cmd_consultar(token, chat_id, "/consultar " + texto)
 
 
-def ejecutar_una_vez(token):
-    """Modo GitHub Actions: procesa las novedades pendientes y termina."""
-    offset = _leer_offset()
-    try:
-        updates = tg.actualizaciones(token, offset=offset or None, timeout=3)
-    except tg.TelegramError as exc:
-        print(f"[polling] {exc}")
-        return
+def ejecutar_una_vez(token, webhook_activo=False):
+    """Modo GitHub Actions: procesa lo pendiente y revisa el piloto.
 
-    for update in updates:
-        offset = update["update_id"] + 1
-        try:
-            procesar(token, update)
-        except Exception as exc:  # un error no debe tumbar la ejecución
-            print(f"[error] {exc}")
-
-    if updates:
-        _guardar_offset(offset)
-        print(f"Procesadas {len(updates)} novedades. Offset: {offset}")
+    Si Telegram tiene un webhook configurado, getUpdates no debe usarse
+    (Telegram responde 409). En ese caso solo se ejecutan las alertas
+    automáticas; las respuestas interactivas las envía webhook.py.
+    """
+    if webhook_activo:
+        print("Webhook activo: se omite getUpdates; las respuestas van por webhook.")
     else:
-        print("Sin novedades.")
+        offset = _leer_offset()
+        try:
+            updates = tg.actualizaciones(token, offset=offset or None, timeout=3)
+        except tg.TelegramError as exc:
+            print(f"[polling] {exc}")
+            updates = []
+
+        for update in updates:
+            offset = update["update_id"] + 1
+            try:
+                procesar(token, update)
+            except Exception as exc:  # un error no debe tumbar la ejecución
+                print(f"[error] {exc}")
+
+        if updates:
+            _guardar_offset(offset)
+            print(f"Procesadas {len(updates)} novedades. Offset: {offset}")
+        else:
+            print("Sin novedades.")
 
     if os.environ.get("AUTO_ALERTAS") == "1":
         try:
@@ -432,6 +441,7 @@ def main():
         print("Falta el token de Telegram.")
         print("Crea un archivo .env con esta línea:")
         print("  TELEGRAM_TOKEN=123456789:AAA...")
+        print("O defina TELEGRAM_TOKEN_FILE=/ruta/al/token (PythonAnywhere).")
         print("Obtén el token hablando con @BotFather en Telegram.")
         return 1
 
@@ -442,9 +452,23 @@ def main():
         print(f"No se pudo conectar con Telegram: {exc}")
         return 1
 
+    # Un webhook y getUpdates son mutuamente excluyentes. Lo detectamos para
+    # que ni GitHub Actions ni el bot local compitan con PythonAnywhere.
+    webhook_activo = False
+    try:
+        info = tg.llamar(token, "getWebhookInfo")
+        webhook_activo = bool(info.get("url"))
+    except tg.TelegramError as exc:
+        print(f"[webhook] no se pudo verificar el estado: {exc}")
+
     if "--once" in sys.argv:
-        ejecutar_una_vez(token)
+        ejecutar_una_vez(token, webhook_activo=webhook_activo)
         return 0
+
+    if webhook_activo:
+        print("ADVERTENCIA: hay un webhook activo, este modo local no recibirá mensajes.")
+        print("Para usar el bot local ejecute antes: python configurar_webhook.py delete")
+        return 1
 
     if os.environ.get("AUTO_ALERTAS") == "1":
         threading.Thread(target=hilo_automatico, args=(token,), daemon=True).start()

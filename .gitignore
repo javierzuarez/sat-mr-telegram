@@ -8,6 +8,8 @@
 #  guardan el estado entre ejecuciones de GitHub Actions)
 bot_log.txt
 suscriptores.json
+# Estado local del webhook (se crea en PythonAnywhere, no se versiona)
+webhook_offset.txt
 
 # Python
 __pycache__/

@@ -1,0 +1,24 @@
+# Plantilla para el archivo WSGI de PythonAnywhere.
+# Cópiela en /var/www/TU_USUARIO.pythonanywhere.com_wsgi.py desde la pestaña Web.
+# NO subas este archivo con los valores rellenos al repositorio.
+
+import os
+import sys
+
+# 1) Ruta donde quedó clonado el repositorio en PythonAnywhere.
+RUTA = "/home/TU_USUARIO/sat-mr-telegram"
+if RUTA not in sys.path:
+    sys.path.insert(0, RUTA)
+
+# 2) Token FUERA del repo: créalo con  chmod 600 ~/.satmr_token
+os.environ["TELEGRAM_TOKEN_FILE"] = "/home/TU_USUARIO/.satmr_token"
+
+# 3) Ruta secreta del webhook. Genera un valor con:
+#    python -c "import secrets; print('telegram-' + secrets.token_hex(16))"
+os.environ["WEBHOOK_PATH"] = "/telegram-CAMBIAR_POR_SECRETO_ALEATORIO"
+
+# 4) Secreto del header X-Telegram-Bot-Api-Secret-Token (otro valor distinto).
+#    Genera otro con: python -c "import secrets; print(secrets.token_hex(32))"
+os.environ["WEBHOOK_SECRET"] = "CAMBIAR_POR_OTRO_SECRETO_ALEATORIO"
+
+from webhook import application  # noqa: E402
