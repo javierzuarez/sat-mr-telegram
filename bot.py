@@ -2,7 +2,8 @@
 Bot de Telegram del Sistema de Alertas Tempranas de Movilidad Rural.
 
 Ejecución:
-    python bot.py
+    python bot.py            -> modo continuo (PC encendida)
+    python bot.py --once     -> una sola revisión (GitHub Actions)
 
 Requiere un archivo .env con:
     TELEGRAM_TOKEN=123456:ABC...
@@ -33,6 +34,7 @@ import telegram_api as tg
 
 RUTA_USUARIOS = os.path.join(config.BASE_DIR, "usuarios.json")
 RUTA_ESTADO = os.path.join(config.BASE_DIR, "estado_zonas.json")
+RUTA_OFFSET = os.path.join(config.BASE_DIR, "offset.txt")
 INTERVALO_AUTO = 600  # segundos entre revisiones automáticas
 
 _candado = threading.Lock()
@@ -55,6 +57,20 @@ def _escribir_json(ruta, datos):
     with _candado:
         with open(ruta, "w", encoding="utf-8") as archivo:
             json.dump(datos, archivo, ensure_ascii=False, indent=2)
+
+
+def _leer_offset():
+    try:
+        with open(RUTA_OFFSET, encoding="utf-8") as archivo:
+            return int((archivo.read() or "0").strip() or 0)
+    except (OSError, ValueError):
+        return 0
+
+
+def _guardar_offset(offset):
+    with _candado:
+        with open(RUTA_OFFSET, "w", encoding="utf-8") as archivo:
+            archivo.write(str(offset))
 
 
 def usuarios():
@@ -381,6 +397,35 @@ def procesar(token, update):
         cmd_consultar(token, chat_id, "/consultar " + texto)
 
 
+def ejecutar_una_vez(token):
+    """Modo GitHub Actions: procesa las novedades pendientes y termina."""
+    offset = _leer_offset()
+    try:
+        updates = tg.actualizaciones(token, offset=offset or None, timeout=10)
+    except tg.TelegramError as exc:
+        print(f"[polling] {exc}")
+        return
+
+    for update in updates:
+        offset = update["update_id"] + 1
+        try:
+            procesar(token, update)
+        except Exception as exc:  # un error no debe tumbar la ejecución
+            print(f"[error] {exc}")
+
+    if updates:
+        _guardar_offset(offset)
+        print(f"Procesadas {len(updates)} novedades. Offset: {offset}")
+    else:
+        print("Sin novedades.")
+
+    if os.environ.get("AUTO_ALERTAS") == "1":
+        try:
+            revisar_automatico(token)
+        except Exception as exc:
+            print(f"[auto] {exc}")
+
+
 def main():
     token = config.token()
     if not token:
@@ -396,6 +441,10 @@ def main():
     except tg.TelegramError as exc:
         print(f"No se pudo conectar con Telegram: {exc}")
         return 1
+
+    if "--once" in sys.argv:
+        ejecutar_una_vez(token)
+        return 0
 
     if os.environ.get("AUTO_ALERTAS") == "1":
         threading.Thread(target=hilo_automatico, args=(token,), daemon=True).start()

@@ -1,0 +1,41 @@
+name: Bot SAT-MR (cada 5 minutos)
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Procesar mensajes de Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          AUTO_ALERTAS: '1'
+        run: python bot.py --once
+
+      - name: Guardar el estado del bot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add offset.txt usuarios.json estado_zonas.json
+          if ! git diff --cached --quiet; then
+            git commit -m "bot: guarda estado [skip ci]"
+            git push
+          else
+            echo "Sin cambios de estado."
+          fi

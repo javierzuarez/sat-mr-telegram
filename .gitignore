@@ -4,9 +4,9 @@
 !.env.example
 
 # Archivos generados al ejecutar el bot
+# (usuarios.json, estado_zonas.json y offset.txt SI se versionan:
+#  guardan el estado entre ejecuciones de GitHub Actions)
 bot_log.txt
-usuarios.json
-estado_zonas.json
 suscriptores.json
 
 # Python
