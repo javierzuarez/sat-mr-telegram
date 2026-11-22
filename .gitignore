@@ -1,0 +1,19 @@
+# Token y secretos (NUNCA subir)
+.env
+*.env
+!.env.example
+
+# Archivos generados al ejecutar el bot
+bot_log.txt
+usuarios.json
+estado_zonas.json
+suscriptores.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# VS Code
+.vscode/

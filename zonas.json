@@ -1,0 +1,34 @@
+{
+  "departamento": "Cundinamarca",
+  "nota": "Zonas del piloto. Cada zona se asocia a una estación real del IDEAM. Cambie el código y el nombre para adaptarlo a su municipio.",
+  "zonas": [
+    {
+      "id": 1,
+      "nombre": "Ruta vereda - cabecera",
+      "municipio": "Nemocón",
+      "estacion": "0021205970",
+      "estacion_nombre": "HACIENDA SANTA ANA"
+    },
+    {
+      "id": 2,
+      "nombre": "Camino vereda - pueblo",
+      "municipio": "Chía",
+      "estacion": "2120500135",
+      "estacion_nombre": "UNIVERSIDAD DE LA SABANA"
+    },
+    {
+      "id": 3,
+      "nombre": "Tramo rural - puente",
+      "municipio": "Chipaque",
+      "estacion": "0035027100",
+      "estacion_nombre": "CARAZA"
+    },
+    {
+      "id": 4,
+      "nombre": "Sendero de montaña",
+      "municipio": "Yacopí",
+      "estacion": "0023065110",
+      "estacion_nombre": "YACOPI"
+    }
+  ]
+}
