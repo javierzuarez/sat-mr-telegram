@@ -46,8 +46,10 @@ def llamar(token, metodo, timeout=30, **parametros):
                 time.sleep(espera)
                 continue
             raise TelegramError(f"{exc.code}: {info.get('description', detalle)}") from exc
-        except urllib.error.URLError as exc:
-            raise TelegramError(f"No hay conexión con Telegram: {exc.reason}") from exc
+        except (urllib.error.URLError, TimeoutError) as exc:
+            # Un timeout de socket no es URLError: sin esto el bucle muere.
+            detalle = getattr(exc, "reason", exc)
+            raise TelegramError(f"No hay conexión con Telegram: {detalle}") from exc
 
 
 def enviar(token, chat_id, texto, silencioso=False):

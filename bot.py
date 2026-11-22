@@ -127,7 +127,7 @@ def cmd_consultar(token, chat_id, texto):
     if not consulta:
         tg.enviar(
             token, chat_id,
-            "Uso: /consultar <municipio> [departamento]\n"
+            "Uso: /consultar &lt;municipio&gt; [departamento]\n"
             "Ejemplos:\n"
             "/consultar Medellín\n"
             "/consultar Socha Boyacá\n"
@@ -161,7 +161,7 @@ def cmd_ubicacion(token, chat_id, texto):
     if len(partes) < 2:
         tg.enviar(
             token, chat_id,
-            "Uso: /ubicacion <latitud> <longitud>\n"
+            "Uso: /ubicacion &lt;latitud&gt; &lt;longitud&gt;\n"
             "Ejemplo: /ubicacion 4.7110 -74.0721\n\n"
             "Sirve para consultar por vereda o finca. Se usa la estación "
             "más cercana dentro de 250 km.",
@@ -220,7 +220,7 @@ def cmd_buscar(token, chat_id, texto):
     registrar_usuario(chat_id)
     consulta = _argumentos(texto)
     if not consulta:
-        tg.enviar(token, chat_id, "Uso: /buscar <parte del nombre del municipio>")
+        tg.enviar(token, chat_id, "Uso: /buscar &lt;parte del nombre del municipio&gt;")
         return
     try:
         grupos = nacional.buscar(consulta, limite=8)
@@ -480,6 +480,10 @@ def main():
         try:
             updates = tg.actualizaciones(token, offset=offset, timeout=30)
         except tg.TelegramError as exc:
+            if "409" in str(exc) or "other getUpdates request" in str(exc):
+                print("ERROR: ya hay otra instancia del bot escuchando en Telegram.")
+                print("Detén la otra (Ctrl+Shift+B o la terminal anterior) y vuelve a iniciar.")
+                return 1
             print(f"[polling] {exc}")
             time.sleep(3)
             continue

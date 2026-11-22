@@ -118,23 +118,23 @@ def lista_departamentos(datos):
     for nombre, cantidad in datos:
         lineas.append(f"{escape(nombre)} — {cantidad} estaciones")
     lineas.append("")
-    lineas.append("Consulta: /consultar <municipio> <departamento>")
+    lineas.append("Consulta: /consultar &lt;municipio&gt; &lt;departamento&gt;")
     return "\n".join(lineas)
 
 
 def sin_resultado(texto):
     return (
         f"No encontré una estación para <b>{escape(texto)}</b>.\n\n"
-        "Prueba con /buscar <parte del nombre> o revisa los nombres con "
+        "Prueba con /buscar &lt;parte del nombre&gt; o revisa los nombres con "
         "/departamentos.\n"
-        "También puedes usar /ubicacion <latitud> <longitud>."
+        "También puedes usar /ubicacion &lt;latitud&gt; &lt;longitud&gt;."
     )
 
 
 def sin_coordenadas():
     return (
         "No hay estaciones con precipitación reciente cerca de esas coordenadas. "
-        "Prueba con otra ubicación o usa /consultar <municipio>."
+        "Prueba con otra ubicación o usa /consultar &lt;municipio&gt;."
     )
 
 
