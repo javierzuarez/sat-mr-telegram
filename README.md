@@ -244,7 +244,13 @@ Para un piloto comunitario el costo es **$0**.
 
 ---
 
-## 12. Despliegue recomendado: webhook en PythonAnywhere (gratis)
+## 12. Despliegue local (modo actual) y alternativas opcionales
+
+> **Estado actual:** el bot corre en la **PC** con `python bot.py` (o `Ctrl+Shift+B` en VS Code).
+> No hay webhook configurado y el workflow de GitHub Actions está **desactivado**. Las dos
+> secciones siguientes documentan alternativas gratuitas por si más adelante se desea nube.
+
+### 12a. Webhook en PythonAnywhere (opcional, gratis)
 
 Para **respuesta inmediata** (1–3 s), use el plan gratuito de PythonAnywhere. Telegram avisa
 al web app en cuanto se envía un mensaje; no hay que esperar ningún ciclo de polling.
@@ -262,9 +268,16 @@ Resumen: cree el Web App con *Manual configuration*, pegue la plantilla WSGI, ej
 
 ---
 
-## 13. Respaldo: GitHub Actions (sin webhook)
+### 12b. GitHub Actions (opcional, actualmente desactivado)
 
-Si no se configura PythonAnywhere, el bot corre **en la nube sin costo** usando el repositorio público:
+El workflow quedó guardado en el repositorio, pero está **desactivado manualmente** para que no
+compita con el bot local. Para volver a usarlo:
+
+```bash
+gh workflow enable "Bot SAT-MR (cada minuto)" --repo javierzuarez/sat-mr-telegram
+```
+
+Cuando esté activo:
 
 - Archivo: `.github/workflows/bot.yml`
 - Frecuencia: aproximadamente cada **1 minuto** (5 crones escalonados; GitHub no permite menos de
@@ -274,21 +287,15 @@ Si no se configura PythonAnywhere, el bot corre **en la nube sin costo** usando 
 - Estado: `offset.txt`, `usuarios.json` y `estado_zonas.json` se guardan de vuelta en el repo con
   un commit automático `[skip ci]`, para no responder dos veces el mismo mensaje.
 
-Con webhook activo, `bot.py --once` detecta `getWebhookInfo` y **omite `getUpdates`** para no
-competir con PythonAnywhere, pero mantiene las alertas automáticas del piloto.
+⚠️ **No active el workflow mientras el bot local esté corriendo.** Telegram reparte los mensajes
+entre ambos y se duplican o se pierden respuestas. El orden correcto es: detener el local
+(`Ctrl+C`), activar el workflow, y viceversa.
 
-⚠️ Si el bot corre por polling (sin webhook), **detenga el bot local** (`Ctrl+C` en la terminal o
-no use `Ctrl+Shift+B`). Si los dos están activos, Telegram reparte los mensajes y se duplican o
-se pierden respuestas. Con webhook activo, `bot.py` directamente se negará a arrancar en local.
-
-⚠️ GitHub desactiva los workflows programados después de **60 días sin actividad** en el repo.
-Haga un commit o ejecute el workflow manualmente (*Actions → Run workflow*) al menos una vez al mes.
-
-También puede forzar una ejecución desde la pestaña **Actions** del repositorio.
+Con webhook activo, `bot.py --once` detecta `getWebhookInfo` y omite `getUpdates` automáticamente.
 
 ---
 
-## 14. Alcance y advertencia
+## 13. Alcance y advertencia
 
 Este bot es un **canal comunitario de demostración**, no sustituye los sistemas oficiales de
 alerta de emergencia (SMS masivo o *cell broadcast*). Requiere que la persona tenga teléfono
