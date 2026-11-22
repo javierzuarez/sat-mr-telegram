@@ -241,7 +241,31 @@ Para un piloto comunitario el costo es **$0**.
 
 ---
 
-## 12. Alcance y advertencia
+## 12. Despliegue gratuito en GitHub Actions
+
+El bot también corre **en la nube sin costo** usando el repositorio público:
+
+- Archivo: `.github/workflows/bot.yml`
+- Frecuencia: cada **5 minutos** (cron `*/5 * * * *`)
+- Comando: `python bot.py --once` (procesa lo pendiente y termina)
+- Token: guardado como **Secret** `TELEGRAM_TOKEN` en *Settings → Secrets and variables → Actions*
+- Estado: `offset.txt`, `usuarios.json` y `estado_zonas.json` se guardan de vuelta en el repo con
+  un commit automático `[skip ci]`, para no responder dos veces el mismo mensaje.
+
+Para probarlo: abra el bot en Telegram y envíe `/start`. La respuesta puede tardar **hasta 5 minutos**.
+
+⚠️ Si el bot corre en GitHub Actions, **detenga el bot local** (`Ctrl+C` en la terminal o no use
+`Ctrl+Shift+B`). Si los dos están activos, Telegram reparte los mensajes entre ellos y se duplican
+o se pierden respuestas.
+
+⚠️ GitHub desactiva los workflows programados después de **60 días sin actividad** en el repo.
+Haga un commit o ejecute el workflow manualmente (*Actions → Run workflow*) al menos una vez al mes.
+
+También puede forzar una ejecución desde la pestaña **Actions** del repositorio.
+
+---
+
+## 13. Alcance y advertencia
 
 Este bot es un **canal comunitario de demostración**, no sustituye los sistemas oficiales de
 alerta de emergencia (SMS masivo o *cell broadcast*). Requiere que la persona tenga teléfono
