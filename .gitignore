@@ -15,5 +15,6 @@ __pycache__/
 .venv/
 venv/
 
-# VS Code
-.vscode/
+# VS Code (se versiona solo la tarea para arrancar el bot)
+.vscode/*
+!.vscode/tasks.json
